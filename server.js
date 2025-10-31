@@ -129,6 +129,20 @@ app.get('/api/item_category',(req,res)=>{
     })
 })
 
+//Get the item_list 
+app.get('/api/item_list',(req,res)=>{
+    const sql="Select * from new_item_details;"
+    db.execute(sql, (err, result)=>{
+        if(err){
+            console.error("Error during executing the script"+err);
+            res.status(500).json({error: "Error during executing the script" +err});
+        }
+        else{
+            res.status(201).json({data: result});
+        }
+    });
+});
+
 
 //Start the server here and we can use this in the npm package for building the package whenever it is deployed
 app.listen(port,()=>{

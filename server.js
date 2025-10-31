@@ -80,6 +80,41 @@ function checkUserParameters(user_json, res){
     }    
 }
 
+
+function checkItemListParameters(item_json, res){
+    try{
+        const name=item_json['item_name'];
+        const details=item_json['item_details'];
+        const category= item_json['item_category'];
+        const picture=item_json['item_picture'];
+        const price=item_json['item_price'];
+        const active=item_json['active'];
+        const created_date=item_json['created_date']
+        const created_by=item_json['created_by']
+
+        try{
+            const sql=`Insert into new_item_details (item_name,item_details,item_category,item_picture,item_price,active,created_date,created_by) values('${name}','${details}',${category},${picture},${price},${active},${created_date},${created_by})`;
+            console.log(sql)
+            db.execute(sql, (err, result)=>{
+                if(err){
+                    console.error("Error during executing the query"+ err);
+                    res.status(500).json({error: "Error during executing the query"});
+                }
+                else{
+                    res.status(201).json({ success: true, result: result});
+                }
+            })
+        }   
+        catch(Exception){
+            console.error("Error in running the query" +err);
+            res.status(500).json({error: "Error during executing the query"})
+        }
+    }
+    catch(Exception){
+        console.error("Incomplete JSON passed")
+        res.status(500).json({error: "Incomplete JSON passed"});
+    }    
+}
 /**
  * ----------------------------------------API section here----------------------------------------------------------------------------
  */
@@ -101,6 +136,9 @@ app.get('/api/users',(req,res)=>{
     })
 });
 
+/**
+ * Post of user api for creation of new users
+ */
 app.post('/api/users',(req,res)=>{
     if(req.body === undefined){
         res.status(400).json({ error: "Invalid format in the body"});
@@ -129,7 +167,9 @@ app.get('/api/item_category',(req,res)=>{
     })
 })
 
-//Get the item_list 
+/**
+ * Get item list which are present in the database
+ */
 app.get('/api/item_list',(req,res)=>{
     const sql="Select * from new_item_details;"
     db.execute(sql, (err, result)=>{
@@ -141,6 +181,29 @@ app.get('/api/item_list',(req,res)=>{
             res.status(201).json({data: result});
         }
     });
+});
+
+/**
+ * Add item list in the database and make use of the required parameters and functions
+ */
+app.post('/api/item_list', (req, res)=>{
+    if(req.body==undefined){
+        res.status(500).json({ error: "Invalid format in body"});
+    }
+    else{
+        try{
+            const req_detail=req.body
+            const item_detail=JSON.stringify(req_detail)
+            const item_json=JSON.parse(item_detail)
+
+            checkItemListParameters(item_json,res);
+
+        }
+        catch(err){
+            console.error("Error in JSON format"+err);
+            res.status(500).json({error: "Error in JSON format" + err});
+        }
+    }
 });
 
 

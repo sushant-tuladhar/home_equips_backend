@@ -146,6 +146,6 @@ app.get('/api/item_list',(req,res)=>{
 
 //Start the server here and we can use this in the npm package for building the package whenever it is deployed
 app.listen(port,()=>{
-    console.log("Sever running on the http://localhost:3000")
+    console.log(`Sever running on the http://localhost:${port}`);
 });
 

@@ -80,7 +80,12 @@ function checkUserParameters(user_json, res){
     }    
 }
 
-
+/**
+ * @description This function is used to validate the parameters which are present in the JSON body and then triggers for executing the API and giving back
+ * response
+ * @param {*} item_json 
+ * @param {*} res 
+ */
 function checkItemListParameters(item_json, res){
     try{
         const name=item_json['item_name'];
@@ -93,8 +98,8 @@ function checkItemListParameters(item_json, res){
         const created_by=item_json['created_by']
 
         try{
-            const sql=`Insert into new_item_details (item_name,item_details,item_category,item_picture,item_price,active,created_date,created_by) values('${name}','${details}',${category},${picture},${price},${active},${created_date},${created_by})`;
-            console.log(sql)
+            const sql=`Insert into new_item_details (item_name,item_details,item_category,item_picture,item_price,active,created_date,created_by) values('${name}',"${details}",${category},${picture},${price},${active},'${created_date}',${created_by})`;
+            // console.log(sql)
             db.execute(sql, (err, result)=>{
                 if(err){
                     console.error("Error during executing the query"+ err);

@@ -1,0 +1,6 @@
+//Generated and completed features list to be added here
+1. Get item category
+2. Get list of users
+3. Add new user
+4. Get item list all 
+5. Add item

@@ -4,7 +4,7 @@ import express from 'express'
 import cors from 'cors'
 import mysql from 'mysql2'
 import dotenv from 'dotenv'
-
+import crypto from 'crypto'
 
 dotenv.config()
 
@@ -15,7 +15,7 @@ const port = 3000
 app.use(express.json())
 //Enable the CORS here
 app.use(cors({
-    origin: "http://localhost:3000",
+    origin: ["http://localhost:3000", "http://localhost:3001"],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
 }))
@@ -142,6 +142,62 @@ app.get('/api/users',(req,res)=>{
 });
 
 /**
+ * Generate SHA1 Hash for the given input
+ * @param {*} input 
+ * @returns 
+ */
+function generateSHA1Hash(input){
+    return crypto.createHash('sha1').update(input).digest('hex');
+}
+
+
+function validateLogin(res, login){
+    const email=login['email'];
+    let password=login['password'];
+
+    try{
+        if(email===undefined || password===undefined){
+            console.error("Incomplete JSON passed");
+            res.status(500).json({error: "Incomplete JSON passed"});
+        }
+        else{
+            password=generateSHA1Hash(password);
+        }
+    }
+    catch(Exception){
+        console.error("Incomplete JSON passed")
+        res.status(500).json({error: "Incomplete JSON passed"});
+    }
+
+    const sql= `select user_email,user_password from users`;
+    db.execute(sql, (err, result)=>{
+        const users= result;
+        if(err){
+            console.error("Error during executing the query"+ err);
+            res.status(500).json({error: "Error during executing the query"});
+        }
+
+        //Check if the emails and passwords match
+        let isValidUser=false;
+        for(let i=0; i<users.length; i++){
+            if(users[i].user_email===email && users[i].user_password===password){
+                isValidUser=true;
+                break;
+            }
+        }
+        if(isValidUser){
+            res.status(201).json({ success: true, message: "Login successful"});
+        }
+        else{
+            res.status(401).json({ success: false, message: "Invalid email or password"});
+        }
+        
+    });
+}
+
+
+
+/**
  * Post of user api for creation of new users
  */
 app.post('/api/users',(req,res)=>{
@@ -210,6 +266,29 @@ app.post('/api/item_list', (req, res)=>{
         }
     }
 });
+
+/**
+ * Validate the login and generate the unique session token for the user to login
+ */
+app.post('/api/login',(req,res)=>{
+    if(req.body==undefined){
+        res.status(500).json({ error: "Invalid format in body"});
+    }
+    else{
+        try{
+                
+            const req_detail=req.body
+            const login_detail=JSON.stringify(req_detail)
+            const login_json=JSON.parse(login_detail)
+
+            validateLogin(res, login_json);
+        }
+        catch(err){
+            console.error("Error in JSON format"+err);
+            res.status(500).json({error: "Error in JSON format" + err});
+        }
+    }
+})
 
 
 //Start the server here and we can use this in the npm package for building the package whenever it is deployed

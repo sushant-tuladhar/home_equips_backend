@@ -144,13 +144,17 @@ app.get('/api/users',(req,res)=>{
 /**
  * Generate SHA1 Hash for the given input
  * @param {*} input 
- * @returns 
+ * @returns the generated SHA1 hash
  */
 function generateSHA1Hash(input){
     return crypto.createHash('sha1').update(input).digest('hex');
 }
 
-
+/**
+ * 
+ * @param {*} res 
+ * @param {*} login 
+ */
 function validateLogin(res, login){
     const email=login['email'];
     let password=login['password'];
@@ -162,6 +166,7 @@ function validateLogin(res, login){
         }
         else{
             password=generateSHA1Hash(password);
+            // console.log("Generated SHA1 Hash: "+ password);
         }
     }
     catch(Exception){
@@ -186,12 +191,23 @@ function validateLogin(res, login){
             }
         }
         if(isValidUser){
-            res.status(201).json({ success: true, message: "Login successful"});
+            const sessionToken= crypto.randomBytes(16).toString('hex');
+            // console.log("Generated session token: "+ sessionToken);
+
+            const sqlInsertToken=`update users set session_id='${sessionToken}' where user_email='${email}';`;
+            db.execute(sqlInsertToken, (err, result)=>{
+                if(err){
+                    console.error("Error during executing the query"+ err);
+                    res.status(500).json({error: "Error during executing the query"});
+                }
+                else{
+                    res.status(201).json({ success: true, session_token: sessionToken});
+                }
+            });
         }
         else{
             res.status(401).json({ success: false, message: "Invalid email or password"});
-        }
-        
+        }   
     });
 }
 

@@ -316,6 +316,14 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+app.get('/dashboard', (req, res) => {
+    res.sendFile(path.join(__dirname, 'dashboard.html'));
+});
+
+app.get('/signup', (req, res) => {
+    res.sendFile(path.join(__dirname, 'signup.html'));
+});
+
 //Start the server here and we can use this in the npm package for building the package whenever it is deployed
 app.listen(port,()=>{
     console.log(`Sever running on the http://localhost:${port}`);

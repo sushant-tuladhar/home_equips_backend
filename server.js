@@ -5,6 +5,11 @@ import cors from 'cors'
 import mysql from 'mysql2'
 import dotenv from 'dotenv'
 import crypto from 'crypto'
+import path from 'path'
+import {fileURLToPath} from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config()
 
@@ -307,6 +312,9 @@ app.post('/api/login',(req,res)=>{
     }
 })
 
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 //Start the server here and we can use this in the npm package for building the package whenever it is deployed
 app.listen(port,()=>{

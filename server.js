@@ -38,7 +38,8 @@ const db=mysql.createConnection({
 
 db.connect((err)=>{
     if(err){
-        console.error("Couldn't connect to the database with the following error: "+err)
+        console.error("Couldn't connect to the database with the following error: "+err);
+        throw err;
     }
     else{
         console.log("Connected to the mysql server")
